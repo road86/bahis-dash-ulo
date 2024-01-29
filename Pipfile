@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+dash = "~=2.13.0"
+dash-bootstrap-components = "~=1.5.0"
+dash-mantine-components = "~=0.12.1"
+gunicorn = "~=21.2.0"
+pandas = "~=1.5.0"
+colorama = "*" # for windows
+
+[dev-packages]
+black = "*"
+flake8 = "*"
+
+[requires]
+python_version = "3.11"

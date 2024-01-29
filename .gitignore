@@ -1,0 +1,7 @@
+exported_data
+geodata
+logos
+.DS_Store
+plotlydash
+**/__pycache__/
+*.zip
