@@ -128,6 +128,7 @@ def get_pathnames(sourcepath):
     path3 = os.path.join(sourcepath, "processed_geodata", "upadata.geojson")  # 495 Upazila
     return geofilename, dgfilename, sourcefilename, farmdatafilename, path1, path2, path3
 
+
 def fetchsourcedata(sourcefilename):  # fetch and prepare source data
     bahis_data = pd.read_csv(sourcefilename)
     bahis_data["from_static_bahis"] = bahis_data["basic_info_date"].str.contains(
@@ -163,6 +164,7 @@ def fetchsourcedata(sourcefilename):  # fetch and prepare source data
     # limit to static bahis start
     return bahis_data
 
+
 def fetchgeodata(geofilename):  # fetch geodata from bahis, delete mouzas and unions
     geodata = pd.read_csv(geofilename)
     geodata = geodata.drop(
@@ -174,10 +176,12 @@ def fetchgeodata(geofilename):  # fetch geodata from bahis, delete mouzas and un
     geodata[["loc_type"]] = geodata[["loc_type"]].astype(np.uint8)
     return geodata
 
+
 def created_date(sourcefilename):
     create_time = os.path.getmtime(sourcefilename)
     created_date = datetime.fromtimestamp(create_time).date()
     return created_date
+
 
 def fetchdisgroupdata(dgfilename):  # fetch and prepare disease groups
     bahis_dgdata = pd.read_csv(dgfilename)
@@ -190,6 +194,7 @@ def fetchdisgroupdata(dgfilename):  # fetch and prepare disease groups
     bahis_dgdata = bahis_dgdata.drop_duplicates(subset="name", keep="first")
     bahis_distype = bahis_dgdata.drop_duplicates(subset="Disease type", keep="first")
     return bahis_dgdata, bahis_distype
+
 
 def fetchDiseaselist(bahis_data):
     dislis = bahis_data["top_diagnosis"].unique()
