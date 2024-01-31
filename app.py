@@ -207,14 +207,12 @@ def decode(pathname):
 
 # ULOSelUpa = 201539 = 000.008.464.638 = JJJ JJH DFD FCH
 # BBB BBJ FHF HEJ in decimal 66 66 66  66 66 74  70 72 70  72 69 74
-# minus 66 gives 000 008 464 638 
+# minus 66 gives 000 008 464 638
 # divide by 42 gives 201539
 
 # 201539 multiply by 42
 # take each character and add 66
 # take decimal number to character
-
-
 
 def layout(upazilano):
     ULOSelUpa = int(upazilano)
@@ -407,7 +405,6 @@ firstrun = True
     Input("dummy", "id"),
     State("url", "pathname"))
 def display_page(dummy, pathname):
-    
     return layout(decode(pathname[1:]))
 
 
