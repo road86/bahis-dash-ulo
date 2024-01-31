@@ -1,85 +1,3 @@
-# import dash
-# import dash_bootstrap_components as dbc
-# from components import navbar
-# from dash import Dash, Input, Output, dcc, html
-
-# # Connect to your app pages
-# # from pages import dls, ulo, reports #,bahisdashpltOLD
-
-
-# app = Dash(
-#     __name__,
-#     use_pages=True,
-#     external_stylesheets=[dbc.themes.BOOTSTRAP],
-#     meta_tags=[{"name": "viewport", "content": "width=device-width"}],
-#     suppress_callback_exceptions=True,
-# )
-
-# # Define the navbar
-# nav = navbar.Navbar()
-
-# # Define the index page layout
-# # app.layout = html.Div([
-# # #    dcc.Location(id='url', refresh=False),
-# # #    nav,
-# #     #dash.page_container,
-# #     #html.Div(id='page-content', children=[]),
-# # ]) #, fluid=True,)
-
-# app.layout = html.Div(
-#     [
-#         dcc.Location(id="url", refresh=False),
-#         nav,
-#         html.Div([]),
-#         html.Div(id="page-1-display-value"),
-#         dash.page_container,
-#         dcc.Store(id="cache_bahis_data", storage_type="memory"),
-#         dcc.Store(id="cache_bahis_dgdata", storage_type="memory"),
-#         dcc.Store(id="cache_bahis_geodata", storage_type="memory"),
-#     ]
-# )
-
-
-# @app.callback(Output("page-1-display-value", "children"), Input("nav", "value"))
-# def display_value(value):
-#     return f"You have selected {value}"
-
-
-# # "complete" layout
-# app.validation_layout = html.Div(
-#     [
-#         #     dls.layout,
-#         #     ulo,
-#         #     report,m
-#         #     #app,
-#         #     #navbar,
-#         #     #index.layout,
-#         #     #bahisdashpltOLD,
-#         #     #page2,
-#     ]
-# )
-
-
-# # Create the callback to handle mutlipage inputs
-# # @app.callback(Output('page-content', 'children'),
-# #               [Input('url', 'pathname')])
-# # def display_page(pathname):
-# #     if pathname == '/dls':
-# #         return dls.layout
-# #     if pathname == '/ulo':
-# #         return ulo.layout
-# #     if pathname == '/reports':
-# #         return reports.layout
-# #     else: # if redirected to unknown link
-# #         return "404 Page Error! Please choose a link"
-
-# # Run the app on localhost:8050
-# if __name__ == "__main__":
-#     app.run(debug=True, host="0.0.0.0", port=80)
-# else:
-#     server = app.server
-
-
 import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, Input, Output, dcc, html, State
@@ -232,8 +150,6 @@ ULOlast_date = max(bahis_data['date']).date()
 ULOdates = [ULOstart_date, ULOlast_date]
 ULOcreated_date = created_date(sourcefilename)
 
-# ULOSelUpa = 201539 = 000.008.464.638
-
 ULOddDList = []
 
 # bahis_geodata = fetchgeodata(geofilename)
@@ -280,6 +196,24 @@ def open_data(path):
     with open(path) as f:
         data = json.load(f)
     return data
+
+
+def decode(pathname):
+    ULONo = ""
+    for x in range(0, 12):
+        ULONo = ULONo + str(int(ord(pathname[x])) - 66)
+    return int(int(ULONo) / 42)
+
+
+# ULOSelUpa = 201539 = 000.008.464.638 = JJJ JJH DFD FCH
+# BBB BBJ FHF HEJ in decimal 66 66 66  66 66 74  70 72 70  72 69 74
+# minus 66 gives 000 008 464 638 
+# divide by 42 gives 201539
+
+# 201539 multiply by 42
+# take each character and add 66
+# take decimal number to character
+
 
 
 def layout(upazilano):
@@ -473,8 +407,8 @@ firstrun = True
     Input("dummy", "id"),
     State("url", "pathname"))
 def display_page(dummy, pathname):
-    decode = int(int(pathname[1:]) / 42)
-    return layout(decode)
+    
+    return layout(decode(pathname[1:]))
 
 
 @app.callback(
@@ -504,7 +438,7 @@ def update_whatever(
     ULOtabs,
     ULOSelUpa,
 ):
-    ULOSelUpa = int(int(ULOSelUpa[1:]) / 42)
+    ULOSelUpa = decode(ULOSelUpa[1:])  # int(int(ULOSelUpa[1:]) / 42)
     global firstrun, \
         ULOddDList, \
         ULOpath, \
