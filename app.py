@@ -202,6 +202,7 @@ def decode(pathname):
     ULONo = ""
     for x in range(0, 12):
         ULONo = ULONo + str(int(ord(pathname[x])) - 66)
+    print(ULONo)
     return int(int(ULONo) / 42)
 
 
@@ -219,26 +220,6 @@ def layout(upazilano):
     Upazila = str(bahis_geodata[bahis_geodata["value"] == ULOSelUpa]['name'].iloc[0].capitalize())
     return html.Div([
         dcc.Location(id="url", refresh=False),
-        html.Div([
-            dbc.Row(
-                [
-                    dbc.Col(
-                        html.Label("BAHIS dashboard", style={"font-weight": "bold",
-                                                             "font-size": "200%"}),
-                        width=5,
-                    ),
-                    dbc.Col(
-                        html.Img(src=img_logo, height="30px"),
-                        width=3,
-                        # align='right'
-                    )
-                ],
-                justify="end",
-                align="center"
-            )
-        ]),
-        html.Br(),
-
         dbc.Row(
             [
                 dbc.Col(
