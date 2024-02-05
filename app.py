@@ -8,9 +8,10 @@ import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import ReportsSickDead
 from dash import Dash, Input, Output, State, dcc, html
 from dash.dash import no_update
+
+import ReportsSickDead
 
 app = Dash(
     __name__,
