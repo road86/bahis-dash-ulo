@@ -12,26 +12,11 @@ def ReportsSickDead(sub_bahis_sourcedata, dates, periodClick, figheight):
     tmp["date"] = pd.to_datetime(tmp.index)
 
     if periodClick == 3:
-        tmp = (
-            tmp['counts']
-            .groupby(tmp['date'])
-            .sum()
-            .astype(int)
-        )
+        tmp = tmp["counts"].groupby(tmp["date"]).sum().astype(int)
     if periodClick == 2:
-        tmp = (
-            tmp['counts']
-            .groupby(tmp['date'].dt.to_period('W-SAT'))
-            .sum()
-            .astype(int)
-        )
+        tmp = tmp["counts"].groupby(tmp["date"].dt.to_period("W-SAT")).sum().astype(int)
     if periodClick == 1:
-        tmp = (
-            tmp['counts']
-            .groupby(tmp['date'].dt.to_period('M'))
-            .sum()
-            .astype(int)
-        )
+        tmp = tmp["counts"].groupby(tmp["date"].dt.to_period("M")).sum().astype(int)
     tmp = tmp.to_frame()
     tmp["date"] = tmp.index
     tmp["date"] = tmp["date"].astype("datetime64[D]")
@@ -47,9 +32,7 @@ def ReportsSickDead(sub_bahis_sourcedata, dates, periodClick, figheight):
     fig.add_annotation(
         x=datetime.strptime(dates[1], "%Y-%m-%d")
         - timedelta(
-            days=int(
-                ((datetime.strptime(dates[1], "%Y-%m-%d") - datetime.strptime(dates[0], "%Y-%m-%d")).days) * 0.08
-            )
+            days=int(((datetime.strptime(dates[1], "%Y-%m-%d") - datetime.strptime(dates[0], "%Y-%m-%d")).days) * 0.08)
         ),
         y=max(tmp),
         text="total reports " + str("{:,}".format(sub_bahis_sourcedata["date"].size)),
@@ -64,23 +47,18 @@ def ReportsSickDead(sub_bahis_sourcedata, dates, periodClick, figheight):
     )
 
     if periodClick == 3:
-        tmp = (
-            sub_bahis_sourcedata[['sick', 'dead']]
-            .groupby(sub_bahis_sourcedata['date'])
-            .sum()
-            .astype(int)
-        )
+        tmp = sub_bahis_sourcedata[["sick", "dead"]].groupby(sub_bahis_sourcedata["date"]).sum().astype(int)
     if periodClick == 2:
         tmp = (
-            sub_bahis_sourcedata[['sick', 'dead']]
-            .groupby(sub_bahis_sourcedata['date'].dt.to_period('W-SAT'))
+            sub_bahis_sourcedata[["sick", "dead"]]
+            .groupby(sub_bahis_sourcedata["date"].dt.to_period("W-SAT"))
             .sum()
             .astype(int)
         )
     if periodClick == 1:
         tmp = (
-            sub_bahis_sourcedata[['sick', 'dead']]
-            .groupby(sub_bahis_sourcedata['date'].dt.to_period('M'))
+            sub_bahis_sourcedata[["sick", "dead"]]
+            .groupby(sub_bahis_sourcedata["date"].dt.to_period("M"))
             .sum()
             .astype(int)
         )
@@ -89,7 +67,7 @@ def ReportsSickDead(sub_bahis_sourcedata, dates, periodClick, figheight):
     tmp = tmp.rename(columns={"date": "date"})
     tmp["date"] = tmp["date"].astype("datetime64[D]")
     figSick = px.bar(tmp, x="date", y="sick", labels={"date": "", "sick": "No. of Sick Animals"})
-    figSick.update_traces(marker_color='black')
+    figSick.update_traces(marker_color="black")
     figSick.update_layout(height=figheight, margin={"r": 0, "t": 0, "l": 0, "b": 0})
     figSick.update_xaxes(
         range=[
@@ -100,9 +78,7 @@ def ReportsSickDead(sub_bahis_sourcedata, dates, periodClick, figheight):
     figSick.add_annotation(
         x=datetime.strptime(dates[1], "%Y-%m-%d")
         - timedelta(
-            days=int(
-                ((datetime.strptime(dates[1], "%Y-%m-%d") - datetime.strptime(dates[0], "%Y-%m-%d")).days) * 0.08
-            )
+            days=int(((datetime.strptime(dates[1], "%Y-%m-%d") - datetime.strptime(dates[0], "%Y-%m-%d")).days) * 0.08)
         ),
         y=max(tmp),
         text="total sick " + str("{:,}".format(int(sub_bahis_sourcedata["sick"].sum()))),  # realy outlyer
@@ -118,7 +94,7 @@ def ReportsSickDead(sub_bahis_sourcedata, dates, periodClick, figheight):
 
     figDead = px.bar(tmp, x="date", y="dead", labels={"date": "", "dead": "No. of Dead Animals"})
     figDead.update_layout(height=figheight, margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    figDead.update_traces(marker_color='red')
+    figDead.update_traces(marker_color="red")
     figDead.update_xaxes(
         range=[
             datetime.strptime(dates[0], "%Y-%m-%d") - timedelta(days=6),
@@ -128,9 +104,7 @@ def ReportsSickDead(sub_bahis_sourcedata, dates, periodClick, figheight):
     figDead.add_annotation(
         x=datetime.strptime(dates[1], "%Y-%m-%d")
         - timedelta(
-            days=int(
-                ((datetime.strptime(dates[1], "%Y-%m-%d") - datetime.strptime(dates[0], "%Y-%m-%d")).days) * 0.08
-            )
+            days=int(((datetime.strptime(dates[1], "%Y-%m-%d") - datetime.strptime(dates[0], "%Y-%m-%d")).days) * 0.08)
         ),
         y=max(tmp),
         text="total dead " + str("{:,}".format(int(sub_bahis_sourcedata["dead"].sum()))),  # really
