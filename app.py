@@ -1,18 +1,16 @@
+import glob
+import json
+import os
+from datetime import date, datetime
+
 import dash
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html, State
-
-import pandas as pd
-import json
-from datetime import date
-from dash.dash import no_update
-import ReportsSickDead
-import plotly.express as px
-import glob
-import os
-
 import numpy as np
-from datetime import datetime
+import pandas as pd
+import plotly.express as px
+import ReportsSickDead
+from dash import Dash, Input, Output, State, dcc, html
+from dash.dash import no_update
 
 app = Dash(
     __name__,
