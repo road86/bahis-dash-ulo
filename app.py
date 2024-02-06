@@ -213,7 +213,6 @@ def decode(pathname):
     ULONo = ""
     for x in range(0, 12):
         ULONo = ULONo + str(int(ord(pathname[x])) - 66)
-    print(ULONo)
     return int(int(ULONo) / 42)
 
 
