@@ -1,18 +1,17 @@
+import glob
+import json
+import os
+from datetime import date, datetime
+
 import dash
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html, State
-
-import pandas as pd
-import json
-from datetime import date
-from dash.dash import no_update
-import ReportsSickDead
-import plotly.express as px
-import glob
-import os
-
 import numpy as np
-from datetime import datetime
+import pandas as pd
+import plotly.express as px
+from dash import Dash, Input, Output, State, dcc, html
+from dash.dash import no_update
+
+import ReportsSickDead
 
 app = Dash(
     __name__,
@@ -23,7 +22,9 @@ app = Dash(
     prevent_initial_callbacks="initial_duplicate",
 )
 
-dash.register_page(__name__,)  # register page to main dash app
+dash.register_page(
+    __name__,
+)  # register page to main dash app
 pd.options.mode.chained_assignment = None
 
 
@@ -37,9 +38,7 @@ def get_pathnames(sourcepath):
     sourcefilename = os.path.join(
         sourcepath, "preped_data2.csv"
     )  # main data resource of prepared data from old and new bahis
-    farmdatafilename = glob.glob(
-        sourcepath + "bahis_farm_assessment_p2_table*.csv"
-    )[-1]
+    farmdatafilename = glob.glob(sourcepath + "bahis_farm_assessment_p2_table*.csv")[-1]
 
     path1 = os.path.join(sourcepath, "processed_geodata", "divdata.geojson")  # 8 Division
     path2 = os.path.join(sourcepath, "processed_geodata", "distdata.geojson")  # 64 District
@@ -78,7 +77,7 @@ def fetchsourcedata(sourcefilename):  # fetch and prepare source data
     #                                                                                'top_diagnosis']].astype(str)
     # can you change object to string and does it make a memory difference`?
     bahis_data["dead"] = bahis_data["dead"].clip(lower=0)
-    bahis_data = bahis_data[bahis_data['date'] >= datetime(2019, 7, 1)]
+    bahis_data = bahis_data[bahis_data["date"] >= datetime(2019, 7, 1)]
     # limit to static bahis start
     return bahis_data
 
@@ -135,7 +134,7 @@ def disease_subset(cDisease, sub_bahis_sourcedata):
     return sub_bahis_sourcedata
 
 
-sourcepath = "exported_data/"           # called also in Top10, make global or settings parameter
+sourcepath = "exported_data/"  # called also in Top10, make global or settings parameter
 geofilename, dgfilename, sourcefilename, farmdatafilename, path1, path2, path3 = get_pathnames(sourcepath)
 bahis_data = fetchsourcedata(sourcefilename)
 [bahis_dgdata, bahis_distypes] = fetchdisgroupdata(dgfilename)
@@ -146,7 +145,7 @@ created_dated = created_date(sourcefilename)  # implement here
 
 ULOsub_bahis_sourcedata = bahis_data
 ULOstart_date = date(2019, 1, 1)
-ULOlast_date = max(bahis_data['date']).date()
+ULOlast_date = max(bahis_data["date"]).date()
 ULOdates = [ULOstart_date, ULOlast_date]
 ULOcreated_date = created_date(sourcefilename)
 
@@ -162,7 +161,7 @@ def yearlyComp(bahis_data, diseaselist):
     )["date"].agg({"count"})
     monthly = monthly.rename({"count": "reports"}, axis=1)
     monthly = monthly.reset_index()
-    monthly['reports'] = monthly['reports'] / 1000
+    monthly["reports"] = monthly["reports"] / 1000
     monthly["Year"] = monthly["Year"].astype(str)
     figYearlyComp = px.bar(
         data_frame=monthly,
@@ -175,19 +174,31 @@ def yearlyComp(bahis_data, diseaselist):
     figYearlyComp.update_xaxes(dtick="M1")  # , tickformat="%B \n%Y")
     figYearlyComp.update_layout(
         xaxis=dict(
-            tickmode='array',
+            tickmode="array",
             tickvals=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-            ticktext=['January', 'February', 'March', 'April', 'May', 'June',
-                      'July', 'August', 'September', 'October', 'November', 'December'],
-            title=""
+            ticktext=[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ],
+            title="",
         ),
         title={
-            'text': "Disease dynamics for \"" + str(diseaselist) + "\"",
-            'y': 0.95,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        }
+            "text": 'Disease dynamics for "' + str(diseaselist) + '"',
+            "y": 0.95,
+            "x": 0.5,
+            "xanchor": "center",
+            "yanchor": "top",
+        },
     )
     return figYearlyComp
 
@@ -202,7 +213,6 @@ def decode(pathname):
     ULONo = ""
     for x in range(0, 12):
         ULONo = ULONo + str(int(ord(pathname[x])) - 66)
-    print(ULONo)
     return int(int(ULONo) / 42)
 
 
@@ -215,176 +225,186 @@ def decode(pathname):
 # take each character and add 66
 # take decimal number to character
 
+
 def layout(upazilano):
     ULOSelUpa = int(upazilano)
-    Upazila = str(bahis_geodata[bahis_geodata["value"] == ULOSelUpa]['name'].iloc[0].capitalize())
-    return html.Div([
-        dcc.Location(id="url", refresh=False),
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dbc.Card(
-                            dbc.CardBody(
-                                [
-                                    dbc.Row(
-                                        [
-                                            dbc.Col([
-                                                dbc.Row(html.Label(Upazila, style={"font-weight":
-                                                                                   "bold", "font-size": "150%"})),
-                                                dbc.Row(html.Label(ULOSelUpa, id="upazilano", hidden=True))]
-                                            ),
-                                            dbc.Col([
-                                                    dcc.Dropdown(
-                                                        ULOddDList,
-                                                        "All Diseases",
-                                                        id="ULODiseaselist",
-                                                        multi=False,
-                                                        clearable=False,
-                                                    )]
-                                                    ),
-                                            dbc.Col(
-                                                dcc.DatePickerRange(
-                                                    id="ULOdaterange",
-                                                    min_date_allowed=ULOstart_date,
-                                                    start_date=date(2023, 1, 1),
-                                                    max_date_allowed=ULOcreated_date,
-                                                    end_date=ULOlast_date,  # date(2023, 12, 31)
+    Upazila = str(bahis_geodata[bahis_geodata["value"] == ULOSelUpa]["name"].iloc[0].capitalize())
+    return html.Div(
+        [
+            dcc.Location(id="url", refresh=False),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Card(
+                                dbc.CardBody(
+                                    [
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        dbc.Row(
+                                                            html.Label(
+                                                                Upazila,
+                                                                style={"font-weight": "bold", "font-size": "150%"},
+                                                            )
+                                                        ),
+                                                        dbc.Row(html.Label(ULOSelUpa, id="upazilano", hidden=True)),
+                                                    ]
                                                 ),
-                                            ),
-                                        ]
-                                    )
-                                ]
-                            )
-                        ),
-                        dbc.Card(
-                            dbc.CardBody(
-                                [
-                                    dcc.Graph(id="ULOfigMonthly"),
-                                ]
-                            )
-                        )
-                    ],
-                    width=6,
-                ),
-                dbc.Col(
-                    [
-                        dbc.Card(
-                            dbc.CardBody(
-                                [
-                                    dbc.Tabs(
-                                        [
-                                            dbc.Tab(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                dbc.Row(
-                                                                    [
-                                                                        dbc.Col(
-                                                                            [
-                                                                                dbc.Row(dcc.Graph
-                                                                                        (id="ULOReportsLA")),
-                                                                                dbc.Row(dcc.Graph
-                                                                                        (id="ULOSickLA")),
-                                                                                dbc.Row(dcc.Graph
-                                                                                        (id="ULODeadLA")),
-                                                                            ]
-                                                                        ),
-                                                                        dbc.Col(
-                                                                            [
-                                                                                dcc.Slider(
-                                                                                    min=1,
-                                                                                    max=3,
-                                                                                    step=1,
-                                                                                    marks={1: 'Reports monthly',
-                                                                                           2: 'Reports weekly',
-                                                                                           3: 'Reports daily',
-                                                                                           },
-                                                                                    value=2,
-                                                                                    vertical=True,
-                                                                                    id="ULOLAperiodSlider"
-                                                                                )
-                                                                            ],
-                                                                            width=1,
-                                                                        ),
-                                                                    ]
-                                                                )
-                                                            ],
+                                                dbc.Col(
+                                                    [
+                                                        dcc.Dropdown(
+                                                            ULOddDList,
+                                                            "All Diseases",
+                                                            id="ULODiseaselist",
+                                                            multi=False,
+                                                            clearable=False,
                                                         )
-                                                    )
-                                                ],
-                                                label="Large Animal Reports",
-                                                tab_id="ULOReportsLATab",
-                                            ),
-                                            dbc.Tab(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                dbc.Row([
-                                                                    dbc.Col(
-                                                                        [
-                                                                            dbc.Row(dcc.Graph(id="ULOReportsP")),
-                                                                            dbc.Row(dcc.Graph(id="ULOSickP")),
-                                                                            dbc.Row(dcc.Graph(id="ULODeadP")),
-                                                                        ]
-                                                                    ),
-                                                                    dbc.Col(
-                                                                        [
-                                                                            dcc.Slider(
-                                                                                min=1,
-                                                                                max=3,
-                                                                                step=1,
-                                                                                marks={1: 'Reports monthly',
-                                                                                       2: 'Reports weekly',
-                                                                                       3: 'Reports daily',
-                                                                                       },
-                                                                                value=2,
-                                                                                vertical=True,
-                                                                                id="ULOPperiodSlider"
-                                                                            )
-                                                                        ],
-                                                                        width=1,
-                                                                    ),
-                                                                ])
-                                                            ],
-                                                        )
-                                                    )
-
-                                                ],
-                                                label="Poultry Reports",
-                                                tab_id="ULOReportsPTab",
-                                            ),
-                                        ],
-                                        id="ULOtabs",
-                                    )
-                                ]
+                                                    ]
+                                                ),
+                                                dbc.Col(
+                                                    dcc.DatePickerRange(
+                                                        id="ULOdaterange",
+                                                        min_date_allowed=ULOstart_date,
+                                                        start_date=date(2023, 1, 1),
+                                                        max_date_allowed=ULOcreated_date,
+                                                        end_date=ULOlast_date,  # date(2023, 12, 31)
+                                                    ),
+                                                ),
+                                            ]
+                                        )
+                                    ]
+                                )
                             ),
-                        ),
-                    ],
-                    width=6,
-                ),
-            ]),
-        html.Br(),
-        html.Div(id="dummy"),
-        html.Label('Data from ' + str(created_dated), style={'text-align': 'right'}),
-    ])
+                            dbc.Card(
+                                dbc.CardBody(
+                                    [
+                                        dcc.Graph(id="ULOfigMonthly"),
+                                    ]
+                                )
+                            ),
+                        ],
+                        width=6,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Card(
+                                dbc.CardBody(
+                                    [
+                                        dbc.Tabs(
+                                            [
+                                                dbc.Tab(
+                                                    [
+                                                        dbc.Card(
+                                                            dbc.CardBody(
+                                                                [
+                                                                    dbc.Row(
+                                                                        [
+                                                                            dbc.Col(
+                                                                                [
+                                                                                    dbc.Row(
+                                                                                        dcc.Graph(id="ULOReportsLA")
+                                                                                    ),
+                                                                                    dbc.Row(dcc.Graph(id="ULOSickLA")),
+                                                                                    dbc.Row(dcc.Graph(id="ULODeadLA")),
+                                                                                ]
+                                                                            ),
+                                                                            dbc.Col(
+                                                                                [
+                                                                                    dcc.Slider(
+                                                                                        min=1,
+                                                                                        max=3,
+                                                                                        step=1,
+                                                                                        marks={
+                                                                                            1: "Reports monthly",
+                                                                                            2: "Reports weekly",
+                                                                                            3: "Reports daily",
+                                                                                        },
+                                                                                        value=2,
+                                                                                        vertical=True,
+                                                                                        id="ULOLAperiodSlider",
+                                                                                    )
+                                                                                ],
+                                                                                width=1,
+                                                                            ),
+                                                                        ]
+                                                                    )
+                                                                ],
+                                                            )
+                                                        )
+                                                    ],
+                                                    label="Large Animal Reports",
+                                                    tab_id="ULOReportsLATab",
+                                                ),
+                                                dbc.Tab(
+                                                    [
+                                                        dbc.Card(
+                                                            dbc.CardBody(
+                                                                [
+                                                                    dbc.Row(
+                                                                        [
+                                                                            dbc.Col(
+                                                                                [
+                                                                                    dbc.Row(
+                                                                                        dcc.Graph(id="ULOReportsP")
+                                                                                    ),
+                                                                                    dbc.Row(dcc.Graph(id="ULOSickP")),
+                                                                                    dbc.Row(dcc.Graph(id="ULODeadP")),
+                                                                                ]
+                                                                            ),
+                                                                            dbc.Col(
+                                                                                [
+                                                                                    dcc.Slider(
+                                                                                        min=1,
+                                                                                        max=3,
+                                                                                        step=1,
+                                                                                        marks={
+                                                                                            1: "Reports monthly",
+                                                                                            2: "Reports weekly",
+                                                                                            3: "Reports daily",
+                                                                                        },
+                                                                                        value=2,
+                                                                                        vertical=True,
+                                                                                        id="ULOPperiodSlider",
+                                                                                    )
+                                                                                ],
+                                                                                width=1,
+                                                                            ),
+                                                                        ]
+                                                                    )
+                                                                ],
+                                                            )
+                                                        )
+                                                    ],
+                                                    label="Poultry Reports",
+                                                    tab_id="ULOReportsPTab",
+                                                ),
+                                            ],
+                                            id="ULOtabs",
+                                        )
+                                    ]
+                                ),
+                            ),
+                        ],
+                        width=6,
+                    ),
+                ]
+            ),
+            html.Br(),
+            html.Div(id="dummy"),
+            html.P("Data last updated " + str(created_dated), style={"text-align": "right"}),
+        ],
+        style={"margin": "10px"},
+    )
 
 
-app.layout = html.Div([
-    dcc.Location(id="url", refresh=False),
-    html.Div(id="dummy"),
-    html.Div(id="layout")
-])
+app.layout = html.Div([dcc.Location(id="url", refresh=False), html.Div(id="dummy"), html.Div(id="layout")])
 
 firstrun = True
 
 
-@app.callback(
-    Output("layout", "children"),
-    Input("dummy", "id"),
-    State("url", "pathname"))
+@app.callback(Output("layout", "children"), Input("dummy", "id"), State("url", "pathname"))
 def display_page(dummy, pathname):
     return layout(decode(pathname[1:]))
 
@@ -405,7 +425,7 @@ def display_page(dummy, pathname):
     Input("ULOPperiodSlider", "value"),
     Input("ULODiseaselist", "value"),
     Input("ULOtabs", "active_tab"),
-    State("url", "pathname")
+    State("url", "pathname"),
 )
 def update_whatever(
     ULOstart_date,
@@ -417,14 +437,7 @@ def update_whatever(
     ULOSelUpa,
 ):
     ULOSelUpa = decode(ULOSelUpa[1:])  # int(int(ULOSelUpa[1:]) / 42)
-    global firstrun, \
-        ULOddDList, \
-        ULOpath, \
-        ULOvariab, \
-        ULOsubDistM, \
-        ULOtitle, \
-        ULOsub_bahis_sourcedata, \
-        ULOsubDist
+    global firstrun, ULOddDList, ULOpath, ULOvariab, ULOsubDistM, ULOtitle, ULOsub_bahis_sourcedata, ULOsubDist
 
     if firstrun is True:  # inital settings
         ULOddDList = fetchDiseaselist(ULOsub_bahis_sourcedata)
@@ -444,9 +457,9 @@ def update_whatever(
         lanimal = ["Buffalo", "Cattle", "Goat", "Sheep"]
         ULOsub_bahis_sourcedataLA = ULOsub_bahis_sourcedata[ULOsub_bahis_sourcedata["species"].isin(lanimal)]
         ULOfigheight = 175
-        ULOfiggLAR, ULOfiggLASick, ULOfiggLADead = ReportsSickDead.ReportsSickDead(ULOsub_bahis_sourcedataLA,
-                                                                                   ULOdates, ULOLAperiodClick,
-                                                                                   ULOfigheight)
+        ULOfiggLAR, ULOfiggLASick, ULOfiggLADead = ReportsSickDead.ReportsSickDead(
+            ULOsub_bahis_sourcedataLA, ULOdates, ULOLAperiodClick, ULOfigheight
+        )
         return (
             ULOddDList,
             ULOfiggLAR,
@@ -462,8 +475,9 @@ def update_whatever(
         poultry = ["Chicken", "Duck", "Goose", "Pegion", "Quail", "Turkey"]
         ULOsub_bahis_sourcedataP = ULOsub_bahis_sourcedata[ULOsub_bahis_sourcedata["species"].isin(poultry)]
         ULOfigheight = 175
-        ULOfiggPR, ULOfiggPSick, ULOfiggPDead = ReportsSickDead.ReportsSickDead(ULOsub_bahis_sourcedataP, ULOdates,
-                                                                                ULOPperiodClick, ULOfigheight)
+        ULOfiggPR, ULOfiggPSick, ULOfiggPDead = ReportsSickDead.ReportsSickDead(
+            ULOsub_bahis_sourcedataP, ULOdates, ULOPperiodClick, ULOfigheight
+        )
         return (
             ULOddDList,
             no_update,
