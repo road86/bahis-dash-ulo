@@ -309,7 +309,7 @@ def layout(upazilano):
                                                                                     dbc.Row(dcc.Graph(id="ULOSickLA")),
                                                                                     dbc.Row(dcc.Graph(id="ULODeadLA")),
                                                                                 ],
-                                                                                width=5,
+                                                                                # width=5,
                                                                             ),
                                                                             dbc.Col(
                                                                                 [
@@ -327,7 +327,7 @@ def layout(upazilano):
                                                                                         id="ULOLAperiodSlider",
                                                                                     )
                                                                                 ],
-                                                                                width=1,
+                                                                                width=2,
                                                                             ),
                                                                         ]
                                                                     )
@@ -353,7 +353,7 @@ def layout(upazilano):
                                                                                     dbc.Row(dcc.Graph(id="ULOSickP")),
                                                                                     dbc.Row(dcc.Graph(id="ULODeadP")),
                                                                                 ],
-                                                                                width=5,
+                                                                                # width=5,
                                                                             ),
                                                                             dbc.Col(
                                                                                 [
@@ -371,7 +371,7 @@ def layout(upazilano):
                                                                                         id="ULOPperiodSlider",
                                                                                     )
                                                                                 ],
-                                                                                width=1,
+                                                                                width=2,
                                                                             ),
                                                                         ]
                                                                     )
